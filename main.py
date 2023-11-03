@@ -3,6 +3,24 @@ from tkinter import messagebox
 import pyperclip
 import random
 import json
+import rsa
+
+# ---------------------------- PASSWORD ENCRYPTION ------------------------------- #
+def encrypt(msg):
+    with open("public.pem", "rb") as f:
+        public_key = rsa.PublicKey.load_pkcs1(f.read())
+    encrypt_message = rsa.encrypt(msg.encode(),pub_key=public_key)
+    return encrypt_message
+
+# ---------------------------- PASSWORD DECRYPYION ------------------------------- #
+def decrypt(msg):
+    with open("private.pem", "rb") as f:
+        private_key = rsa.PrivateKey.load_pkcs1(f.read())
+    decrypt_message = rsa.decrypt(msg, priv_key = private_key)
+    return decrypt_message
+    
+
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 
@@ -40,8 +58,10 @@ def search(website):
         if website in data:
             email = data[website]["email"]
             password = data[website]["password"]
-            pyperclip.copy(password)
-            messagebox.showinfo(website, f"Email: {email}\nPassword: {password}")
+            password1 = bytes.fromhex(password)
+            decrypt_password = decrypt(password1).decode()
+            pyperclip.copy(decrypt_password)
+            messagebox.showinfo(website, f"Email: {email}\nPassword: {decrypt_password}")
         else:
             messagebox.showerror(website, f"Website not exists")
 
@@ -52,10 +72,11 @@ def save_data():
     website = inputWeb.get()
     username = inputUser.get()
     password = inputPass.get()
+    encrypted_password = encrypt(password)
     new_data = {
         website: {
             "email": username,
-            "password": password
+            "password": encrypted_password.hex()
         }
 
     }
@@ -125,7 +146,7 @@ genPass = Button(text="Generate Password", highlightthickness=0, command=passwor
 genPass.grid(column=3, row=4)
 
 # Add Button
-add_btn = Button(text="Add", highlightthickness=0, width=43, command=save_data)
+add_btn = Button(text="Add", highlightthickness=0, width=47, command=save_data)
 add_btn.config(pady=10)
 add_btn.grid(column=2, row=5, columnspan=3)
 
