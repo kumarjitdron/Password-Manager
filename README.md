@@ -1,5 +1,5 @@
 # Password-Manager
-Save and Retrieve and randomly generate using this Python Based Password Manager Tool
+Save , Retrieve and randomly generate password using this Python Based Password Manager Tool
 It will store your password in encrypted form , we use here rsa algorithm to encrypt passsword<br>
 <b>Note: First run keygen.py only once in your local system to generate public and private key</b>
 
